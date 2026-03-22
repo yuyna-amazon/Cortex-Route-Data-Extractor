@@ -5,8 +5,8 @@
 // @description  Extract route data from Cortex
 // @author       yuyna
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=amazon.com
-// @updateURL    https://raw.githubusercontent.com/yuyna-amazon/DSP-Scheduling/main/Cortex Route Data Extractor.user.js
-// @downloadURL  https://raw.githubusercontent.com/yuyna-amazon/DSP-Scheduling/main/Cortex Route Data Extractor.user.js
+// @updateURL    https://raw.githubusercontent.com/yuyna-amazon/DSP-Scheduling/main/CortexRouteDataExtractor.user.js
+// @downloadURL  https://raw.githubusercontent.com/yuyna-amazon/DSP-Scheduling/main/CortexRouteDataExtractor.user.js
 // @match        https://logistics.amazon.co.jp/internal/operations/execution/dv/routes*
 // @grant        none
 // ==/UserScript==
