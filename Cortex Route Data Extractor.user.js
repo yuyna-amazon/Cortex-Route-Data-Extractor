@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Cortex Route Data Extractor
 // @namespace    http://tampermonkey.net/
-// @version      2.0
+// @version      2.1
 // @description  Extract route data from Cortex
 // @author       yuyna
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=amazon.com
