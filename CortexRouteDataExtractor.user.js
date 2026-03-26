@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Cortex Route Data Extractor
 // @namespace    http://tampermonkey.net/
-// @version      2.1
+// @version      2.2
 // @description  Extract route data from Cortex
 // @author       yuyna
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=amazon.com
@@ -14,71 +14,108 @@
 (function() {
     'use strict';
 
+    // ボタンが既に存在するかチェック
+    function buttonExists() {
+        return document.getElementById('cortex-route-extractor-btn') !== null;
+    }
+
     // ダウンロードボタンを作成してナビゲーションに追加
     function createDownloadButton() {
-        const navMenu = document.querySelector('ul.fp-nav-menu-list');
-        if (!navMenu) {
-            createFixedButton();
+        if (buttonExists()) {
+            console.log('[Route Extractor] Button already exists');
             return;
         }
 
-        const listItem = document.createElement('li');
-        listItem.className = 'fp-nav-menu-list-item';
-        listItem.style.cssText = 'margin-left: auto; padding: 0 20px;';
+        console.log('[Route Extractor] Attempting to create button...');
 
-        const button = document.createElement('a');
-        button.href = '#';
-        button.style.cssText = `
-            background-color: #FF9900;
-            color: #000000;
-            padding-top: 8px;
-            padding-bottom: 8px;
-            padding-left: 30px;
-            padding-right: 30px;
-            border-radius: 0;
-            text-decoration: none;
-            font-weight: bold;
-            cursor: pointer;
-            display: inline-block;
-            white-space: nowrap;
-        `;
-        button.innerText = 'Route data';
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            startExtraction();
-        });
+        // 複数のセレクタを試す
+        const navSelectors = [
+            'ul.fp-nav-menu-list',
+            'nav ul',
+            'header ul',
+            '[class*="nav"] ul',
+            '[class*="menu"] ul'
+        ];
 
-        listItem.appendChild(button);
-        navMenu.appendChild(listItem);
+        let navMenu = null;
+        for (const selector of navSelectors) {
+            navMenu = document.querySelector(selector);
+            if (navMenu) {
+                console.log('[Route Extractor] Found nav with selector:', selector);
+                break;
+            }
+        }
+
+        if (navMenu) {
+            const listItem = document.createElement('li');
+            listItem.className = 'fp-nav-menu-list-item';
+            listItem.style.cssText = 'margin-left: auto; padding: 0 20px;';
+
+            const button = document.createElement('a');
+            button.id = 'cortex-route-extractor-btn';
+            button.href = '#';
+            button.style.cssText = `
+                background-color: #FF9900;
+                color: #000000;
+                padding-top: 8px;
+                padding-bottom: 8px;
+                padding-left: 30px;
+                padding-right: 30px;
+                border-radius: 0;
+                text-decoration: none;
+                font-weight: bold;
+                cursor: pointer;
+                display: inline-block;
+                white-space: nowrap;
+            `;
+            button.innerText = 'Route data';
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                startExtraction();
+            });
+
+            listItem.appendChild(button);
+            navMenu.appendChild(listItem);
+            console.log('[Route Extractor] Button added to nav');
+        } else {
+            console.log('[Route Extractor] Nav not found, creating fixed button');
+            createFixedButton();
+        }
     }
 
     function createFixedButton() {
+        if (buttonExists()) {
+            return;
+        }
+
         const button = document.createElement('button');
+        button.id = 'cortex-route-extractor-btn';
         button.textContent = 'Route data';
         button.style.cssText = `
             position: fixed;
-            top: 10px;
-            right: 10px;
-            z-index: 9999;
-            padding: 10px 30px;
+            top: 60px;
+            right: 20px;
+            z-index: 999999;
+            padding: 12px 30px;
             background-color: #FF9900;
             color: #000000;
-            border: none;
-            border-radius: 0;
+            border: 2px solid #000;
+            border-radius: 4px;
             cursor: pointer;
             font-size: 14px;
             font-weight: bold;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+            font-family: Arial, sans-serif;
         `;
         button.addEventListener('click', startExtraction);
         document.body.appendChild(button);
+        console.log('[Route Extractor] Fixed button created');
     }
 
     // datepickerから日付を取得（ファイル名用: YYYY-MM-DD形式）
     function getDateForFileName() {
         const datepicker = document.querySelector('input[id^="datepicker"]');
         if (datepicker && datepicker.value) {
-            // MM/DD/YYYY → YYYY-MM-DD に変換
             const parts = datepicker.value.split('/');
             if (parts.length === 3) {
                 const month = parts[0];
@@ -87,7 +124,6 @@
                 return `${year}-${month}-${day}`;
             }
         }
-        // フォールバック: 今日の日付
         return new Date().toISOString().slice(0, 10);
     }
 
@@ -95,7 +131,6 @@
     function getDateForCSV() {
         const datepicker = document.querySelector('input[id^="datepicker"]');
         if (datepicker && datepicker.value) {
-            // MM/DD/YYYY → YYYY/M/D に変換（ゼロパディング除去）
             const parts = datepicker.value.split('/');
             if (parts.length === 3) {
                 const month = parseInt(parts[0], 10);
@@ -104,7 +139,6 @@
                 return `${year}/${month}/${day}`;
             }
         }
-        // フォールバック: 今日の日付
         const today = new Date();
         return `${today.getFullYear()}/${today.getMonth() + 1}/${today.getDate()}`;
     }
@@ -229,6 +263,7 @@
 
         const scrollContainer = document.querySelector('div[data-virtuoso-scroller="true"]');
         if (!scrollContainer) {
+            alert('スクロールコンテナが見つかりません。ページを再読み込みしてください。');
             return;
         }
 
@@ -237,7 +272,7 @@
             position: fixed;
             top: 50px;
             right: 10px;
-            z-index: 9999;
+            z-index: 9999999;
             padding: 10px 20px;
             background-color: #232F3E;
             color: white;
@@ -290,6 +325,8 @@
 
         if (sortedData.length > 0) {
             downloadCSV(sortedData);
+        } else {
+            alert('データが見つかりませんでした。');
         }
 
         window.scrollTo(0, 0);
@@ -300,12 +337,8 @@
     }
 
     function downloadCSV(data) {
-        // Day列を先頭に追加
         const headers = ['Day', 'Cycle', 'RouteCode', 'Route所要時間', '出発時間', 'Ship数'];
-
-        // CSV用の日付を取得（YYYY/M/D形式）
         const selectedDateForCSV = getDateForCSV();
-        // ファイル名用の日付を取得（YYYY-MM-DD形式）
         const selectedDateForFile = getDateForFileName();
 
         let csvContent = '\uFEFF';
@@ -314,7 +347,6 @@
         data.forEach(row => {
             const values = headers.map(header => {
                 let value;
-                // Day列の場合は日付を設定
                 if (header === 'Day') {
                     value = selectedDateForCSV;
                 } else {
@@ -341,8 +373,23 @@
         document.body.removeChild(link);
     }
 
-    window.addEventListener('load', function() {
-        setTimeout(createDownloadButton, 2000);
-    });
+    // 初期化関数
+    function init() {
+        console.log('[Route Extractor] Initializing...');
+        createDownloadButton();
+    }
+
+    // 複数の方法で初期化を試みる
+    if (document.readyState === 'complete') {
+        setTimeout(init, 1000);
+    } else {
+        window.addEventListener('load', function() {
+            setTimeout(init, 2000);
+        });
+    }
+
+    // さらに遅延して再試行
+    setTimeout(init, 3000);
+    setTimeout(init, 5000);
 
 })();
