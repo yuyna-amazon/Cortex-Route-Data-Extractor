@@ -155,7 +155,7 @@
 
         if (totalMinutes >= 0 && totalMinutes < 420) return 'SSD1';
         if (totalMinutes >= 420 && totalMinutes < 600) return 'SSD3';
-        if (totalMinutes >= 600 && totalMinutes < 840) return 'SSD4';
+        if (totalMinutes >= 600 && totalMinutes < 780) return 'SSD4';
         if (totalMinutes >= 840 && totalMinutes < 1020) return 'SSD5';
         if (totalMinutes >= 1020 && totalMinutes < 1200) return 'SSD7';
         if (totalMinutes >= 1200 && totalMinutes < 1440) return 'SSD8';
