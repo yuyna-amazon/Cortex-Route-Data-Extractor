@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Cortex Route Data Extractor
 // @namespace    http://tampermonkey.net/
-// @version      3.1
+// @version      3.2
 // @description  Extract route data from Cortex
 // @author       yuyna
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=amazon.com
@@ -154,11 +154,11 @@
         const totalMinutes = hours * 60 + minutes;
 
         if (totalMinutes >= 0 && totalMinutes < 390) return 'SSD1';
-        if (totalMinutes >= 390 && totalMinutes < 570) return 'SSD3';
-        if (totalMinutes >= 570 && totalMinutes < 810) return 'SSD4';
-        if (totalMinutes >= 810 && totalMinutes < 990) return 'SSD5';
-        if (totalMinutes >= 990 && totalMinutes < 1170) return 'SSD7';
-        if (totalMinutes >= 1170 && totalMinutes < 1440) return 'SSD8';
+        if (totalMinutes >= 390 && totalMinutes < 570) return 'SSD1B';
+        if (totalMinutes >= 570 && totalMinutes < 810) return 'SSD2';
+        if (totalMinutes >= 810 && totalMinutes < 990) return 'SSD3';
+        if (totalMinutes >= 990 && totalMinutes < 1170) return 'SSD3B';
+        if (totalMinutes >= 1170 && totalMinutes < 1440) return 'SSD4';
 
         return '';
     }
