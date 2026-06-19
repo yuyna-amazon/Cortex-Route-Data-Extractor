@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Cortex Route Data Extractor
 // @namespace    http://tampermonkey.net/
-// @version      2.4
+// @version      3.1
 // @description  Extract route data from Cortex
 // @author       yuyna
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=amazon.com
@@ -153,12 +153,12 @@
         const minutes = parseInt(timeParts[2], 10);
         const totalMinutes = hours * 60 + minutes;
 
-        if (totalMinutes >= 0 && totalMinutes < 420) return 'SSD1';
-        if (totalMinutes >= 420 && totalMinutes < 600) return 'SSD3';
-        if (totalMinutes >= 600 && totalMinutes < 780) return 'SSD4';
-        if (totalMinutes >= 840 && totalMinutes < 1020) return 'SSD5';
-        if (totalMinutes >= 1020 && totalMinutes < 1200) return 'SSD7';
-        if (totalMinutes >= 1200 && totalMinutes < 1440) return 'SSD8';
+        if (totalMinutes >= 0 && totalMinutes < 390) return 'SSD1';
+        if (totalMinutes >= 390 && totalMinutes < 570) return 'SSD3';
+        if (totalMinutes >= 570 && totalMinutes < 810) return 'SSD4';
+        if (totalMinutes >= 810 && totalMinutes < 990) return 'SSD5';
+        if (totalMinutes >= 990 && totalMinutes < 1170) return 'SSD7';
+        if (totalMinutes >= 1170 && totalMinutes < 1440) return 'SSD8';
 
         return '';
     }
@@ -245,12 +245,20 @@
 
             const cycle = getCycle(departureTime);
 
+            // DA名を取得（p.css-cizv6o の title属性またはテキスト）
+            let daName = '';
+            const daNameElement = card.querySelector('p.css-cizv6o');
+            if (daNameElement) {
+                daName = daNameElement.getAttribute('title') || daNameElement.textContent.trim();
+            }
+
             return {
                 Cycle: cycle,
                 RouteCode: routeCode,
                 'Route所要時間': routeDuration,
                 '出発時間': departureTime,
-                'Ship数': shipCount
+                'Ship数': shipCount,
+                'DA名': daName
             };
         } catch (e) {
             console.error('Error extracting data from card:', e);
@@ -337,7 +345,7 @@
     }
 
     function downloadCSV(data) {
-        const headers = ['Day', 'Cycle', 'RouteCode', 'Route所要時間', '出発時間', 'Ship数'];
+        const headers = ['Day', 'Cycle', 'RouteCode', 'Route所要時間', '出発時間', 'Ship数', 'DA名'];
         const selectedDateForCSV = getDateForCSV();
         const selectedDateForFile = getDateForFileName();
 
