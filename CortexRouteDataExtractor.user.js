@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Cortex Route Data Extractor
 // @namespace    http://tampermonkey.net/
-// @version      3.2
+// @version      3.3
 // @description  Extract route data from Cortex
 // @author       yuyna
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=amazon.com
@@ -166,11 +166,11 @@
     function getCycleOrder(cycle) {
         const order = {
             'SSD1': 1,
-            'SSD3': 2,
-            'SSD4': 3,
-            'SSD5': 4,
-            'SSD7': 5,
-            'SSD8': 6
+            'SSD1B': 2,
+            'SSD2': 3,
+            'SSD3': 4,
+            'SSD3B': 5,
+            'SSD4': 6
         };
         return order[cycle] || 99;
     }
